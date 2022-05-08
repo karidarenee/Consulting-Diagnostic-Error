@@ -1,0 +1,84 @@
+---
+title: "5/7-Visualization"
+author: "Yongrong Chai"
+date: "5/7/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+files <- list.files("/Users/karidakarida_c/Desktop/Data/psu", pattern = ".csv$", recursive = TRUE, full.names = TRUE)
+total <- do.call(rbind,lapply(files,read.csv))
+total = subset(total, Lead.Diagnosis.Accuracy.Score != "25")
+```
+
+```{r}
+#H1.a. Students with higher illness script concordance (I.S.C.) scores will have higher lead diagnosis accuracy. 
+h1.a <- cbind(total[2:3], total[15], total[17])
+h1.a <- subset(h1.a, Lead.Diagnosis.Accuracy.Score != "25")
+h1.a$Lead.Diagnosis.Accuracy.Score <- plyr::mapvalues(h1.a$Lead.Diagnosis.Accuracy.Score, from = c("0","50","100"), to = c(1,2,3))
+h1.a$Lead.Diagnosis.Accuracy.Score <- as.numeric(h1.a$Lead.Diagnosis.Accuracy.Score)
+# boxplot
+ggplot(h1.a) + geom_boxplot(aes(x = factor(Lead.Diagnosis.Accuracy.Score), y = I.S.C..Score))
+```
+
+
+```{r}
+#H1.b. Students with higher script concordance scores will have higher differential diagnosis accuracy.
+h1.b <- cbind(total[2:3], total[16:17])
+h1.b <- na.omit(h1.b)
+# scatterplot
+cor(h1.b$Differential.Diagnosis.Score, h1.b$I.S.C..Score)
+# scatterplot
+ggplot(h1.b) +
+  aes(x = I.S.C..Score, y = Differential.Diagnosis.Score) +
+  geom_point(color = "#0c4c8a") +
+  geom_smooth()+
+  theme_minimal()+
+  scale_y_log10()
+```
+
+```{r}
+#H2. Students with higher differential diagnosis scores will have higher diagnostic accuracy scores.
+
+d1 = density(total$Differential.Diagnosis.Score)
+plot(d1)
+d2 = density(total$Lead.Diagnosis.Accuracy.Score)
+plot(d2)
+
+ggplot(total) +
+  aes(x = Differential.Diagnosis.Score, y = Lead.Diagnosis.Accuracy.Score) +
+  geom_point(color = "#0c4c8a") +
+  geom_smooth()+
+  theme_minimal()+ 
+  scale_y_log10()+
+  ylab("Lead.Diagnosis.Accuracy.Score in log scale")
+
+```
+```{r}
+#H3. Students with higher self-assessed problem representation scores will have higher diagnostic accuracy scores.
+head(total)
+d4 = density(na.omit(total$P.R..Concordance.Score))
+plot(d4)
+
+ggplot(total) +
+  aes(x = P.R..Concordance.Score, y = Lead.Diagnosis.Accuracy.Score) +
+  geom_point(color = "#0c4c8a") +
+  geom_smooth()+
+  theme_minimal()+ 
+  scale_y_log10()+
+  scale_x_log10()+
+  xlab("P.R..Concordance.Score in log scale") + ylab("Lead.Diagnosis.Accuracy.Score in log scale")
+```
+```{r}
+lm.model = lm(Lead.Diagnosis.Accuracy.Score ~ P.R..Concordance.Score, data = total)
+summary(lm.model)
+
+```
+
+
+
