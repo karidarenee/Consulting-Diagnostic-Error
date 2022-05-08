@@ -77,8 +77,39 @@ ggplot(total) +
 ```{r}
 lm.model = lm(Lead.Diagnosis.Accuracy.Score ~ P.R..Concordance.Score, data = total)
 summary(lm.model)
-
 ```
+
+```{r}
+# h10_a and h10_b
+pacman::p_load(tidyverse,gridExtra)
+theme_set(theme_bw())
+
+# load data
+dir_df <- 'Data/psu'
+files <- list.files(dir_df, pattern = ".csv$", recursive = TRUE, full.names = TRUE)
+total <- read_csv(files) %>% bind_rows()
+
+# make subset for h10_a and h10_b
+h10_a <- total[,c(11,15)]
+h10_b <- total[,c(11,16)]
+
+hist10_a <- ggplot(h10_a) + geom_bar(aes(x=`Time Spent (min)`, y=`Lead Diagnosis Accuracy Score`,
+                             col=factor(`Time Spent (min)`)),stat='identity') + theme(legend.position='None') +
+  geom_vline(aes(xintercept=mean(h10_a$`Time Spent (min)`)), 
+             color="navy", linetype="dashed", size=0.5)
+
+hist10_b <- ggplot(h10_b,aes(x=`Time Spent (min)`,y=`Differential Diagnosis Score`,col=factor(`Time Spent (min)`))) + 
+  geom_bar(stat='identity') + theme(legend.position='None') + 
+  geom_vline(aes(xintercept=mean(h10_b$`Time Spent (min)`)), 
+             color="navy", linetype="dashed", size=0.5)
+
+densi10_a <- ggplot(h10_a) + geom_density(aes(x=`Lead Diagnosis Accuracy Score`))
+densi10_b <- ggplot(h10_b) + geom_density(aes(x=`Differential Diagnosis Score`))
+
+grid.arrange(hist10_a,densi10_a,ncol=2)
+grid.arrange(hist10_b,densi10_b,ncol=2)
+```
+
 
 
 
