@@ -57,6 +57,8 @@ ggplot(total) +
   theme_minimal()+ 
   scale_y_log10()+
   ylab("Lead.Diagnosis.Accuracy.Score in log scale")
+  
+ggplot(total) + geom_boxplot(aes(y = Differential.Diagnosis.Score, x = as.factor(Lead.Diagnosis.Accuracy.Score)))
 
 ```
 ```{r}
@@ -73,6 +75,9 @@ ggplot(total) +
   scale_y_log10()+
   scale_x_log10()+
   xlab("P.R..Concordance.Score in log scale") + ylab("Lead.Diagnosis.Accuracy.Score in log scale")
+
+ggplot(total) + geom_boxplot(aes(y = P.R..Concordance.Score, x = as.factor(Lead.Diagnosis.Accuracy.Score)))
+
 ```
 ```{r}
 lm.model = lm(Lead.Diagnosis.Accuracy.Score ~ P.R..Concordance.Score, data = total)
